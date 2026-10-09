@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f9dfeb">
+  <title>Почини конвейер — математический квест, 2 класс</title>
+  <style>
+    :root { --ink:#4f3554; --violet:#7d5799; --pink:#ec72a1; --mint:#76beb2; --cream:#fff9f1; --ring:#f8c66a; --shadow:0 22px 75px rgba(77,42,79,.22); }
+    *{box-sizing:border-box}
+    html,body{width:100%;height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+    body{font-family:ui-rounded,"Trebuchet MS",Arial,sans-serif;color:var(--ink);background:#f7e7ee;touch-action:manipulation}
+    button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+    button:focus-visible,[tabindex="0"]:focus-visible {outline:4px solid var(--ring);outline-offset:3px}
+    button:disabled{cursor:not-allowed;filter:grayscale(.45);opacity:.55}
+    [hidden]{display:none!important}
+    #game{position:relative;width:100vw;height:100dvh;min-height:250px;isolation:isolate;overflow:hidden;background:radial-gradient(circle at 20% 30%,#fff8e7,#f2dceb 70%)}
+    #sceneMedia{position:absolute;inset:0;overflow:hidden}
+    #sceneMedia img,#sceneMedia video{display:block;width:100%;height:100%;object-fit:contain;object-position:center center}
+    #sceneMedia video{background:transparent}
+    #sceneMedia .shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(34,20,36,.10),transparent 24%,transparent 73%,rgba(46,25,47,.12));}
+    .corner-label {position:absolute;top:clamp(12px,2.8vh,24px);left:clamp(12px,2.6vw,32px);z-index:5;max-width:calc(100% - 32px);padding:clamp(9px,1.5vh,16px) clamp(14px,2.2vw,27px);border:2px solid rgba(255,255,255,.85);border-radius:22px;background:rgba(255,250,245,.90);box-shadow:0 8px 28px rgba(94,68,92,.12);backdrop-filter:blur(12px)}
+    .corner-label .tiny{font-weight:800;letter-spacing:.10em;text-transform:uppercase;font-size:clamp(10px,1.25vw,13px);color:#a15b8c}
+    .corner-label h1{font-size:clamp(22px,3vw,39px);line-height:1.04;margin:.12em 0;color:#6a4479}
+    .corner-label p{font-size:clamp(12px,1.32vw,16px);margin:.34em 0 0;font-weight:700;color:#745b72}
+    .corner-label.small{padding:clamp(8px,1.4vh,13px) clamp(12px,2vw,22px);border-radius:19px}
+    .corner-label.small h1{font-size:clamp(17px,2.2vw,28px)}
+    .corner-label.small p{max-width:570px}
+    .progress{position:absolute;z-index:5;top:clamp(12px,2.8vh,24px);right:clamp(12px,2.6vw,32px);display:flex;gap:7px;padding:10px 12px;border-radius:50px;background:rgba(255,249,247,.92);box-shadow:0 8px 28px rgba(94,68,92,.13)}
+    .progress i{display:block;width:clamp(22px,2.5vw,35px);height:9px;border-radius:50px;background:#dfc8d7}
+    .progress i.current{background:#ef80a5}
+    .progress i.done{background:#7fc6ab}
+    .btn{border:0;border-radius:999px;min-height:52px;min-width:155px;padding:12px 30px;font-weight:900;font-size:clamp(16px,2.1vw,23px);letter-spacing:.025em;color:white;background:linear-gradient(135deg,#f586b4,#e46e9f);box-shadow:0 7px 0 #bf4a7a,0 12px 24px rgba(177,71,121,.24);transition:transform .14s ease,filter .14s ease,box-shadow .14s ease}
+    .btn:hover:not(:disabled){filter:brightness(1.04);transform:translateY(-2px)}
+    .btn:active:not(:disabled){transform:translateY(4px);box-shadow:0 3px 0 #bf4a7a,0 6px 12px rgba(177,71,121,.24)}
+    .btn.alt{background:linear-gradient(135deg,#8ccdc1,#52a99e);box-shadow:0 6px 0 #39897f,0 11px 24px rgba(35,114,109,.25)}
+    .btn.mini{min-width:0;min-height:44px;padding:8px 22px;font-size:clamp(14px,1.7vw,19px)}
+    .screen-action{position:absolute;z-index:7;bottom:max(6vh,25px);left:50%;transform:translateX(-50%);white-space:nowrap}
+    .screen-action .btn{font-size:clamp(18px,2.5vw,28px);min-height:64px;padding:14px clamp(30px,4vw,58px)}
+    #exitButton{position:absolute;z-index:9;top:clamp(12px,2.8vh,24px);right:clamp(12px,2.6vw,32px);width:54px;height:54px;border:2px solid white;border-radius:50%;background:rgba(255,248,249,.95);box-shadow:0 8px 23px #57385133;font-size:33px;font-weight:700;color:#7b5176;line-height:1}
+    #exitButton:hover{background:#ffebef}
+    .status-note{position:absolute;z-index:7;bottom:20%;left:50%;transform:translateX(-50%);padding:15px 22px;text-align:center;max-width:88vw;border-radius:18px;background:rgba(255,249,245,.93);font-weight:800;box-shadow:var(--shadow)}
+    .hotspot{position:absolute;z-index:8;background:transparent;border:0;min-width:44px;min-height:44px;border-radius:50%;padding:0;touch-action:manipulation}
+    .hotspot::after{content:"";position:absolute;inset:1px;border:3px solid rgba(255,255,255,.0);border-radius:50%;transform:scale(.95);transition:.2s}
+    .hotspot:hover::after,.hotspot:focus-visible::after{border-color:#fff0a1;box-shadow:0 0 0 6px rgba(235,110,169,.42),0 0 24px #fff;transform:scale(1.16)}
+    .hotspot.hint::after{animation:glimmer 1.1s ease-in-out 3}
+    @keyframes glimmer{0%,100%{border-color:transparent;box-shadow:none}50%{border-color:#fff3a0;box-shadow:0 0 0 8px rgba(241,130,180,.48),0 0 18px #fff}}
+    .find-prompt {position:absolute;bottom:clamp(12px,2.8vh,25px);left:50%;transform:translateX(-50%);max-width:calc(100% - 40px);z-index:6;border:2px solid rgba(255,255,255,.95);background:rgba(255,249,238,.90);border-radius:50px;box-shadow:0 8px 25px rgba(90,64,80,.13);font-size:clamp(13px,1.65vw,19px);font-weight:800;padding:10px 22px;text-align:center;white-space:normal}
+    .find-prompt strong{color:#a74b86}
+    #modal{position:absolute;z-index:20;inset:0;display:flex;align-items:center;justify-content:center;padding:clamp(9px,2vh,22px);background:rgba(45,23,48,.46);backdrop-filter:blur(3px)}
+    .panel{width:min(860px,96vw);max-height:calc(100dvh - 20px);display:flex;flex-direction:column;overflow:hidden;border-radius:clamp(18px,3vw,32px);border:3px solid #fff;background:linear-gradient(145deg,#fffdfa 0%,#fff2f7 62%,#f8f0ff 100%);box-shadow:var(--shadow);animation:pop .28s ease-out}
+    @keyframes pop{from{transform:translateY(10px) scale(.985);opacity:0}to{transform:none;opacity:1}}
+    .panel-header{display:flex;gap:12px;align-items:center;justify-content:space-between;border-bottom:2px dashed #f0d5e3;padding:clamp(10px,2vh,21px) clamp(14px,3vw,29px) clamp(7px,1.5vh,17px)}
+    .panel-header h2{margin:0;font-size:clamp(20px,2.4vw,31px);line-height:1.08;color:#745283}
+    .panel-header .subtitle{font-size:clamp(12px,1.5vw,16px);line-height:1.25;margin:6px 0 0;color:#796375;font-weight:700}
+    .step-badge{flex-shrink:0;background:#fbe0eb;border-radius:40px;color:#9b5485;font-size:clamp(11px,1.3vw,15px);font-weight:900;padding:9px 14px;text-align:center}
+    .panel-content{padding:clamp(10px,1.8vh,19px) clamp(14px,3vw,29px);display:flex;flex-direction:column;gap:clamp(7px,1.4vh,14px);flex:1;min-height:0;overflow:hidden}
+    .panel-footer{display:flex;min-height:clamp(72px,11vh,97px);padding:9px clamp(14px,3vw,29px) clamp(15px,2.2vh,24px);gap:12px;align-items:center;justify-content:space-between;border-top:2px dashed #f3ddea}
+    #feedback{font-size:clamp(13px,1.6vw,18px);font-weight:900;line-height:1.22;flex:1;min-height:1.3em;color:#b35b78}
+    #feedback.good{color:#387e66}
+    .question{font-weight:900;text-align:center;line-height:1.2;font-size:clamp(19px,3vw,29px);margin:clamp(4px,1vh,10px) 0}
+    .answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(9px,1.7vh,17px);flex:1;min-height:0}
+    .answer{border:2px solid #efd0e0;border-radius:20px;min-height:55px;padding:10px;background:#fff;box-shadow:0 4px 0 #edd7e0;font-weight:900;font-size:clamp(19px,3vw,29px);color:#6b497a;transition:.14s}
+    .answer:hover:not(:disabled){border-color:#ee85ad;background:#fff4f8;transform:translateY(-1px)}
+    .answer.correct{border-color:#6dba9e;background:#e5fff1;color:#297960;box-shadow:0 4px 0 #88c7b1}
+    .answer.wrong{border-color:#ef8ba0;background:#ffe5eb;color:#b5486a}
+    .sequence-list{display:grid;grid-template-rows:repeat(5,minmax(0,1fr));gap:clamp(4px,.8vh,8px);flex:1;min-height:0;touch-action:none}
+    .seq-item{display:flex;align-items:center;gap:12px;min-height:0;padding:5px 10px;background:#fff;border:2px solid #ead5e8;border-radius:15px;box-shadow:0 3px 0 #ecdeea;cursor:grab;user-select:none;touch-action:none;position:relative}
+    .seq-item:hover{border-color:#ba98d1}
+    .seq-item.selected{border-color:#d57ca7;box-shadow:0 0 0 3px #ffe0ee}
+    .seq-item.correct{background:#eafff0;border-color:#8acdaf}
+    .seq-item.dragging{z-index:5;opacity:.88;box-shadow:0 12px 30px rgba(98,60,118,.25);cursor:grabbing}
+    .seq-grip{font-size:clamp(16px,2vw,22px);opacity:.45}
+    .seq-text{font-size:clamp(17px,2.4vw,25px);font-weight:900;flex:1;text-align:center}
+    .move-actions{display:flex;gap:5px}
+    .move-actions button{border:0;border-radius:9px;background:#f6e6f1;color:#795080;min-width:43px;min-height:40px;font-weight:900;font-size:19px;line-height:1}
+    .move-actions button:hover:not(:disabled){background:#ecd2e6}
+    .sequence-tip{font-size:clamp(12px,1.4vw,15px);font-weight:700;text-align:center;color:#796579}
+    .sort-layout{display:grid;grid-template-columns:1fr 1.1fr;gap:clamp(8px,1.2vw,17px);flex:1;min-height:0}
+    .sort-source,.sort-zones{min-height:0;display:flex;flex-direction:column;gap:8px}
+    .zone-label{font-weight:900;font-size:clamp(13px,1.5vw,16px);text-align:center}
+    .dropzone{position:relative;display:flex;flex-wrap:wrap;align-content:flex-start;align-items:flex-start;justify-content:center;gap:7px;min-height:0;flex:1;padding:clamp(9px,1.3vh,13px);border:2px dashed #d7b2d3;border-radius:18px;background:rgba(255,255,255,.62);transition:.14s}
+    .dropzone.over,.dropzone:focus-visible{border-color:#ed7eae;background:#fff1f8}
+    .dropzone.bank{background:#fffaf0;border-color:#e9cfb3}
+    .dropzone.bad{border-color:#e98894;background:#fff0f2}
+    .dropzone.ok{border-color:#8ec7ac;background:#eafff0}
+    .sort-card{display:flex;align-items:center;justify-content:center;min-height:43px;min-width:72px;max-width:100%;padding:8px 12px;border:2px solid #e7c8df;border-radius:14px;background:linear-gradient(#fff,#fff0f7);color:#6e467a;font-size:clamp(15px,2vw,20px);font-weight:900;box-shadow:0 3px 0 #e6cadb;user-select:none;touch-action:none;cursor:grab;position:relative}
+    .sort-card.chosen{border-color:#b34d89;background:#ffe1f1;box-shadow:0 0 0 3px #ecc2e0}
+    .sort-card.dragging{z-index:40;opacity:.86;box-shadow:0 12px 24px #8b5f8960}
+    .sort-card.incorrect{border-color:#e98894;background:#ffe5e9}
+    .dropzone .zone-title{width:100%;display:block;text-align:center;font-size:clamp(12px,1.6vw,18px);font-weight:900;margin-bottom:1px;color:#87638a}
+    .dropzone.bank .zone-title{color:#9f7771}
+    #confetti{position:absolute;z-index:35;inset:0;pointer-events:none;overflow:hidden}
+    .confetti-bit{position:absolute;top:-8vh;width:10px;height:18px;border-radius:4px;animation:fall 1.6s cubic-bezier(.27,.75,.5,1) both}
+    @keyframes fall{to{transform:translate(var(--x),110vh) rotate(var(--r));opacity:0}}
+    .media-error{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:min(580px,90%);padding:22px 25px;border:2px solid #fff;border-radius:24px;text-align:center;background:rgba(255,251,248,.94);font-size:clamp(14px,2vw,19px);font-weight:800;box-shadow:var(--shadow)}
+    .media-error small{display:block;font-size:clamp(11px,1.4vw,14px);font-weight:600;margin-top:8px}
+    #toast{position:absolute;z-index:40;left:50%;bottom:15%;transform:translateX(-50%);max-width:88vw;border-radius:18px;background:#fff9ed;padding:16px 21px;font-weight:800;box-shadow:var(--shadow);text-align:center}
+    @media(max-width:660px){.corner-label.small{max-width:75vw}.progress{padding:8px}.progress i{width:15px;height:7px}.panel{width:98vw}.sort-layout{grid-template-columns:1fr 1fr}.sort-card{padding:5px 8px;min-height:37px;min-width:65px}.sort-source,.sort-zones{gap:4px}.dropzone{padding:5px;gap:4px}.panel-footer{gap:5px}}
+    @media(max-height:560px){.corner-label{top:9px;left:12px;padding:7px 14px}.corner-label h1{font-size:20px}.corner-label p{font-size:12px}.progress{top:9px;right:12px}.find-prompt{bottom:9px;padding:7px 16px}.panel{max-height:calc(100dvh - 12px);border-radius:17px}.panel-header{padding:7px 12px}.panel-header h2{font-size:18px}.panel-header .subtitle{font-size:11px;margin:2px 0}.panel-content{padding:5px 12px;gap:5px}.panel-footer{min-height:52px;padding:4px 12px 8px}.btn.mini{min-height:40px}.answer{min-height:42px;padding:4px}.question{font-size:18px;margin:2px 0}.seq-item{padding:2px 6px}.seq-text{font-size:16px}.move-actions button{min-height:32px;min-width:36px}.sort-card{min-height:30px;padding:3px 8px}.dropzone{padding:3px}.dropzone .zone-title{font-size:12px}.screen-action{bottom:18px}.screen-action .btn{min-height:48px}}
+    @media(prefers-reduced-motion:reduce){*,*::after,*::before{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+<main id="game" aria-label="Математический квест «Почини конвейер»">
+  <div id="sceneMedia" aria-hidden="true">
+    <img id="sceneImage" hidden alt="">
+    <video id="sceneVideo" hidden playsinline preload="auto"></video>
+    <div class="shade"></div>
+    <div id="mediaError" class="media-error" hidden></div>
+  </div>
+  <div id="brand" class="corner-label">
+    <span id="eyebrow" class="tiny">Математический квест • 2 класс</span>
+    <h1 id="sceneTitle">Почини конвейер</h1>
+    <p id="sceneDesc">Сладкой фабрике нужна помощь!</p>
+  </div>
+  <div id="progress" class="progress" aria-label="Этапы ремонта" hidden><i></i><i></i><i></i></div>
+  <button id="hotspot" class="hotspot" type="button" hidden aria-label="Найти предмет"></button>
+  <div id="findPrompt" class="find-prompt" hidden></div>
+  <div id="videoAction" class="screen-action" hidden><button class="btn" id="videoButton" type="button">▶ Смотреть легенду</button></div>
+  <button id="exitButton" aria-label="Закрыть квест" title="Закрыть квест" type="button" hidden>×</button>
+  <div id="toast" role="status" hidden></div>
+  <section id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+    <div class="panel">
+      <header class="panel-header">
+        <div><h2 id="modalTitle"></h2><p class="subtitle" id="modalSubtitle"></p></div>
+        <div id="stepBadge" class="step-badge"></div>
+      </header>
+      <div id="modalContent" class="panel-content"></div>
+      <footer class="panel-footer">
+        <div id="feedback" role="status" aria-live="polite"></div>
+        <button id="taskButton" class="btn mini" type="button">Проверить</button>
+      </footer>
+    </div>
+  </section>
+  <div id="confetti" aria-hidden="true"></div>
+</main>
+<script>
+'use strict';
+/*
+  Папка с index.html должна содержать пять медиафайлов:
+  1.mp4 — видео-легенда, 2.png — картинка задания 1,
+  3.png — картинка задания 2, 4.png — картинка задания 3,
+  5.mp4 — заключительное видео.
+  Допустимые расширения изображений: png/jpg/jpeg/webp;
+  видео: mp4/webm/mov. Если имена другие — замените их в MEDIA.
+
+  Координаты HOTSPOTS настроены для ранее созданных акварельных фонов:
+  2 — розовый монстрик держит гаечный ключ;
+  3 — монстрик держит розовую шестерёнку;
+  4 — у монстрика на конвейере красный рычаг.
+*/
+const MEDIA = {
+  1: ['1.mp4','1.webm','1.mov'],
+  2: ['2.png','2.jpg','2.jpeg','2.webp','сладкая_мастерская_ремонт_конвейера.png'],
+  3: ['3.png','3.jpg','3.jpeg','3.webp','пастельная_мастерская_конфетного_механика.png'],
+  4: ['4.png','4.jpg','4.jpeg','4.webp','пастельная_фабрика_сладостей.png'],
+  5: ['5.mp4','5.webm','5.mov']
+};
+// Проценты от исходного изображения, НЕ от окна браузера.
+const HOTSPOTS = {
+  2: {x:70.5,y:52.0,w:6.3,h:15.2,name:'гаечный ключ'},
+  3: {x:57.0,y:50.9,w:7.0,h:15.3,name:'розовую шестерёнку'},
+  4: {x:66.0,y:54.0,w:5.2,h:13.7,name:'красный рычаг'}
+};
+const LESSON = {
+  subject:'Математика',grade:2,topic:'Сложение и вычитание в пределах 100',
+  reference:'М. И. Моро и др., «Математика. 2 класс» (тематический ориентир)',
+  quiz:[
+    {q:'Сколько будет 27 + 15?', options:['32','42','52','41'],right:1},
+    {q:'Вычисли: 63 − 28', options:['45','36','35','34'],right:2},
+    {q:'Найди значение: 46 + 17', options:['53','73','62','63'],right:3},
+    {q:'Вычисли: 81 − 39', options:['41','52','42','40'],right:2},
+    {q:'Сколько будет 29 + 34?', options:['53','62','63','64'],right:2}
+  ],
+  sequence:[
+    {id:'a',label:'15 + 7',value:22},
+    {id:'b',label:'40 − 9',value:31},
+    {id:'c',label:'26 + 18',value:44},
+    {id:'d',label:'71 − 16',value:55},
+    {id:'e',label:'49 + 19',value:68}
+  ],
+  sort:[
+    {id:'s1',label:'24 + 16',right:'even'},
+    {id:'s2',label:'35 − 8',right:'odd'},
+    {id:'s3',label:'47 + 11',right:'even'},
+    {id:'s4',label:'62 − 19',right:'odd'},
+    {id:'s5',label:'28 + 14',right:'even'}
+  ]
+};
+const $=id=>document.getElementById(id);
+const game=$('game'), scene=$('sceneMedia'), img=$('sceneImage'), video=$('sceneVideo'), videoAction=$('videoAction'), videoButton=$('videoButton'), hotspot=$('hotspot');
+const modal=$('modal'), content=$('modalContent'), taskButton=$('taskButton'), feedback=$('feedback');
+let screen=1, quizIndex=0, quizAnswered=false, sequence=[], seqPicked=null, sortPlacements={}, sortPicked=null, taskSolved=false, loadToken=0, toastTimer=0, hintTimer=0;
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a};
+const setFeedback=(message,good=false)=>{feedback.textContent=message;feedback.classList.toggle('good',good)};
+function toast(text){clearTimeout(toastTimer);$('toast').textContent=text;$('toast').hidden=false;toastTimer=setTimeout(()=>$('toast').hidden=true,3200)}
+function resetState(){quizIndex=0;quizAnswered=false;taskSolved=false;seqPicked=null;sortPicked=null;sequence=shuffle(LESSON.sequence.map(o=>o.id));sortPlacements=Object.fromEntries(LESSON.sort.map(o=>[o.id,'bank']));}
+function confetti(){const box=$('confetti');box.replaceChildren();const colors=['#ed79a5','#f9bb6c','#80c8b7','#b89ce7','#fff3ae'];for(let i=0;i<35;i++){const bit=document.createElement('i');bit.className='confetti-bit';bit.style.left=(5+Math.random()*90)+'%';bit.style.backgroundColor=colors[i%colors.length];bit.style.animationDelay=(Math.random()*.65)+'s';bit.style.setProperty('--x',(Math.random()*150-75)+'px');bit.style.setProperty('--r',(Math.random()*920-460)+'deg');box.appendChild(bit)}setTimeout(()=>box.replaceChildren(),2800)}
+function videoDone(){if(screen===1){videoAction.hidden=false;videoButton.textContent='ПОМОЧЬ';videoButton.onclick=()=>showScreen(2)}else if(screen===5){videoAction.hidden=false;videoButton.textContent='ПРОЙТИ ЕЩЁ РАЗ';videoButton.onclick=()=>{resetState();showScreen(1)}}}
+function missingAsset(number){$('mediaError').hidden=false;$('mediaError').innerHTML=(number===1||number===5? 'Не найдено видео.':'Не найдено изображение.')+'<small>Разместите файл '+number+(number===1||number===5?'.mp4':'.png')+' рядом с index.html.</small>';
+  if(number===1||number===5)videoDone();}
+function loadImage(number,token){const candidates=MEDIA[number];let attempt=0;img.hidden=false;img.onload=()=>{if(token!==loadToken)return;img.hidden=false;positionHotspot()};img.onerror=()=>{if(token!==loadToken)return;if(attempt<candidates.length){img.src=encodeURI(candidates[attempt++])}else{img.hidden=true;missingAsset(number);positionHotspot()}};img.src=encodeURI(candidates[attempt++]);}
+function loadVideo(number,token){const candidates=MEDIA[number];let attempt=0;video.hidden=false;video.controls=false;video.muted=false;video.playsInline=true;
+  const tryNext=()=>{if(token!==loadToken)return;if(attempt>=candidates.length){video.hidden=true;missingAsset(number);return}video.src=encodeURI(candidates[attempt++]);video.load()};
+  video.onerror=tryNext;
+  video.onended=()=>{if(token===loadToken)videoDone()};
+  video.onloadeddata=async()=>{if(token!==loadToken)return;try{await video.play()}catch(error){if(token!==loadToken)return;videoAction.hidden=false;videoButton.textContent=number===1?'▶ Смотреть легенду':'▶ Смотреть финал';videoButton.onclick=async()=>{videoAction.hidden=true;try{await video.play()}catch(e){videoAction.hidden=false;toast('Для видео нажмите кнопку воспроизведения ещё раз.')}}}};
+  tryNext();
+}
+function positionHotspot(){if(screen<2||screen>4||hotspot.hidden)return;const stage=scene.getBoundingClientRect(),v=HOTSPOTS[screen];
+ const w=img.naturalWidth||1672,h=img.naturalHeight||941;const scale=Math.min(stage.width/w,stage.height/h),dw=w*scale,dh=h*scale,x=(stage.width-dw)/2,y=(stage.height-dh)/2;
+ const rw=Math.max(44,dw*v.w/100),rh=Math.max(44,dh*v.h/100),cx=x+dw*v.x/100,cy=y+dh*v.y/100;
+ hotspot.style.left=(cx-rw/2)+'px';hotspot.style.top=(cy-rh/2)+'px';hotspot.style.width=rw+'px';hotspot.style.height=rh+'px';}
+window.addEventListener('resize',positionHotspot);
+function showScreen(number){screen=number;loadToken++;const token=loadToken;clearTimeout(hintTimer);$('mediaError').hidden=true;$('toast').hidden=true;modal.hidden=true;videoAction.hidden=true;hotspot.hidden=true;$('findPrompt').hidden=true;video.pause();video.onloadeddata=null;video.onerror=null;video.onended=null;video.removeAttribute('src');video.load();video.hidden=true;img.hidden=true;img.removeAttribute('src');img.onload=null;img.onerror=null;
+ const titles={1:['Почини конвейер','Сладкой фабрике нужна твоя помощь!'],2:['Найди инструмент','Первый шаг: проверь работу механизма'],3:['Восстанови порядок','Второй шаг: настрой движение ленты'],4:['Рассортируй детали','Последний шаг: запусти конвейер'],5:['Ура! Конвейер починен!','Сладкая фабрика снова работает!']};
+ $('sceneTitle').textContent=titles[number][0];$('sceneDesc').textContent=titles[number][1];$('eyebrow').textContent=number===1?'Математический квест • 2 класс':number===5?'Спасибо за помощь!':'Математика • 2 класс';$('brand').classList.toggle('small',number!==1&&number!==5);
+ $('progress').hidden=!(number>=2&&number<=4);$('exitButton').hidden=number!==5;[...$('progress').children].forEach((el,i)=>{el.className=i===number-2?'current':i<number-2?'done':''});
+ if(number===1||number===5){loadVideo(number,token)}else{hotspot.hidden=false;hotspot.setAttribute('aria-label','Найти '+HOTSPOTS[number].name);loadImage(number,token);$('findPrompt').innerHTML='🔎 Найди <strong>'+HOTSPOTS[number].name+'</strong> на картинке и нажми!';$('findPrompt').hidden=false;positionHotspot();hintTimer=setTimeout(()=>{if(screen===number&&!hotspot.hidden)hotspot.classList.add('hint')},11000)}
+}
+hotspot.addEventListener('click',()=>{hotspot.classList.remove('hint');openTask()});
+function openTask(){if(screen<2||screen>4)return;modal.hidden=false;$('findPrompt').hidden=true;hotspot.hidden=true;taskSolved=false;setFeedback('');if(screen===2){quizIndex=0;quizAnswered=false;renderQuiz()}else if(screen===3){seqPicked=null;renderSequence()}else if(screen===4){sortPicked=null;renderSort()}}
+function completeTask(){taskSolved=true;confetti();if(screen===2)setFeedback('Отлично! Первая часть ремонта выполнена!',true);else if(screen===3)setFeedback('Молодец! Механизм почти восстановлен!',true);else setFeedback('Ура! Конвейер починен!',true);taskButton.disabled=false;taskButton.textContent=screen===4?'ЗАВЕРШИТЬ':'ДАЛЕЕ';taskButton.onclick=()=>showScreen(screen+1)}
+function renderQuiz(){const q=LESSON.quiz[quizIndex];$('modalTitle').textContent='Проверь механизм';$('modalSubtitle').textContent='Выбери один правильный ответ';$('stepBadge').textContent=(quizIndex+1)+' / 5';content.innerHTML='';const question=document.createElement('div');question.className='question';question.textContent=q.q;content.append(question);const answers=document.createElement('div');answers.className='answers';q.options.forEach((text,i)=>{const btn=document.createElement('button');btn.className='answer';btn.type='button';btn.textContent=text;btn.addEventListener('click',()=>{if(quizAnswered)return;if(i===q.right){quizAnswered=true;btn.classList.add('correct');answers.querySelectorAll('button').forEach(b=>b.disabled=true);if(quizIndex===4){completeTask()}else{setFeedback('Верно! ✓',true);taskButton.disabled=false;taskButton.textContent='СЛЕДУЮЩИЙ';taskButton.onclick=()=>{quizIndex++;quizAnswered=false;renderQuiz()}}}else{btn.classList.add('wrong');setFeedback('Попробуй ещё раз');setTimeout(()=>btn.classList.remove('wrong'),650)}});answers.append(btn)});content.append(answers);taskButton.disabled=true;taskButton.textContent='СЛЕДУЮЩИЙ';setFeedback('')}
+function seqOrderCorrect(){return sequence.every((id,i)=>id===LESSON.sequence[i].id)}
+function swapSeq(a,b){[sequence[a],sequence[b]]=[sequence[b],sequence[a]];seqPicked=null;renderSequence()}
+function moveSeq(a,b){if(b<0||b>=sequence.length||a===b)return;let [v]=sequence.splice(a,1);sequence.splice(b,0,v);seqPicked=null;renderSequence()}
+function renderSequence(){if(screen!==3)return;$('modalTitle').textContent='Собери последовательность';$('modalSubtitle').textContent='От меньшего ответа к большему';$('stepBadge').textContent='5 элементов';content.innerHTML='';const tip=document.createElement('div');tip.className='sequence-tip';tip.textContent='Перетаскивай карточки или используй стрелки ↑ ↓';content.append(tip);const list=document.createElement('div');list.className='sequence-list';list.id='sequenceList';sequence.forEach((id,i)=>{const data=LESSON.sequence.find(x=>x.id===id);const item=document.createElement('div');item.className='seq-item'+(seqPicked===i?' selected':'')+(taskSolved?' correct':'');item.tabIndex=0;item.dataset.index=i;const grip=document.createElement('span');grip.className='seq-grip';grip.textContent='⠿';grip.setAttribute('aria-hidden','true');const text=document.createElement('span');text.className='seq-text';text.textContent=data.label;const moves=document.createElement('div');moves.className='move-actions';for(let [label,delta] of [['↑',-1],['↓',1]]){const btn=document.createElement('button');btn.type='button';btn.textContent=label;btn.title=delta===-1?'Передвинуть выше':'Передвинуть ниже';btn.setAttribute('aria-label',btn.title+' '+data.label);btn.disabled=taskSolved||i+delta<0||i+delta>=sequence.length;btn.onclick=e=>{e.stopPropagation();moveSeq(i,i+delta)};moves.append(btn)}item.append(grip,text,moves);item.addEventListener('keydown',e=>{if(taskSolved)return;if(e.key==='ArrowUp'&&i>0){e.preventDefault();moveSeq(i,i-1)}if(e.key==='ArrowDown'&&i<4){e.preventDefault();moveSeq(i,i+1)}if(e.key==='Enter'||e.key===' '){e.preventDefault();selectSeq(i)}});item.addEventListener('click',e=>{if(e.target.closest('button')||taskSolved||seqDrag.moved)return;selectSeq(i)});item.addEventListener('pointerdown',seqDown);list.append(item)});content.append(list);taskButton.textContent=taskSolved?'ДАЛЕЕ':'ПРОВЕРИТЬ';taskButton.disabled=false;taskButton.onclick=()=>{if(taskSolved){showScreen(4);return}if(seqOrderCorrect()){list.querySelectorAll('.seq-item').forEach(x=>x.classList.add('correct'));completeTask()}else{setFeedback('Порядок пока неверный. Попробуй ещё раз.')}}}
+function selectSeq(i){if(seqPicked===null){seqPicked=i;setFeedback('Теперь выбери другую карточку для обмена.')}else if(seqPicked===i){seqPicked=null;setFeedback('')}else{swapSeq(seqPicked,i);setFeedback('')}renderSequence()}
+let seqDrag={item:null,startY:0,moved:false,index:0,dy:0};
+function seqDown(e){if(taskSolved||e.target.closest('button')||e.button!==0)return;const item=e.currentTarget;seqDrag={item,startY:e.clientY,moved:false,index:Number(item.dataset.index),dy:0};item.setPointerCapture(e.pointerId);item.addEventListener('pointermove',seqMove);item.addEventListener('pointerup',seqUp,{once:true});item.addEventListener('pointercancel',seqCancel,{once:true})}
+function seqMove(e){const d=seqDrag;if(d.item!==e.currentTarget)return;d.dy=e.clientY-d.startY;if(Math.abs(d.dy)>8){d.moved=true;d.item.classList.add('dragging');d.item.style.transform='translateY('+d.dy+'px)'}}
+function seqUp(e){const d=seqDrag;if(d.item!==e.currentTarget)return;d.item.removeEventListener('pointermove',seqMove);d.item.style.transform='';d.item.classList.remove('dragging');if(d.moved){const rows=[...$('sequenceList').children];const destination=rows.reduce((best,row,i)=>Math.abs(row.getBoundingClientRect().top+row.offsetHeight/2-e.clientY)<best.dist?{dist:Math.abs(row.getBoundingClientRect().top+row.offsetHeight/2-e.clientY),index:i}:best,{dist:Infinity,index:d.index}).index;moveSeq(d.index,destination);seqDrag.moved=true;setTimeout(()=>{seqDrag.moved=false},20)}seqDrag.item=null}
+function seqCancel(e){if(seqDrag.item!==e.currentTarget)return;seqDrag.item.removeEventListener('pointermove',seqMove);seqDrag.item.style.transform='';seqDrag.item.classList.remove('dragging');seqDrag.item=null}
+function assignSort(id,zone){sortPlacements[id]=zone;sortPicked=null;setFeedback('');renderSort()}
+function renderSort(){if(screen!==4)return;$('modalTitle').textContent='Рассортируй конфеты';$('modalSubtitle').textContent='Вычисли и разложи по типу ответа';$('stepBadge').textContent='5 элементов';content.innerHTML='';const layout=document.createElement('div');layout.className='sort-layout';const source=document.createElement('div');source.className='sort-source';const zones=document.createElement('div');zones.className='sort-zones';
+ function zone(id,label){const box=document.createElement('div');box.className='dropzone'+(id==='bank'?' bank':'');box.dataset.zone=id;box.tabIndex=0;box.setAttribute('aria-label','Категория '+label);box.onclick=(e)=>{if(e.target.closest('.sort-card'))return;if(sortPicked!==null&&!taskSolved)assignSort(sortPicked,id)};box.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();if(sortPicked!==null&&!taskSolved)assignSort(sortPicked,id)}};const title=document.createElement('span');title.className='zone-title';title.textContent=label;box.append(title);LESSON.sort.filter(x=>sortPlacements[x.id]===id).forEach(item=>{const card=document.createElement('div');card.className='sort-card'+(sortPicked===item.id?' chosen':'');card.tabIndex=0;card.setAttribute('role','button');card.setAttribute('aria-label','Карточка '+item.label);card.dataset.id=item.id;card.textContent=item.label;card.addEventListener('pointerdown',sortDown);card.onclick=e=>{e.stopPropagation();if(taskSolved||sortDrag.moved)return;sortPicked=sortPicked===item.id?null:item.id;setFeedback(sortPicked?'Теперь нажми на нужную корзину.':'');renderSort()};card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();if(!taskSolved){sortPicked=item.id;setFeedback('Теперь нажми на нужную корзину.');renderSort()}}});box.append(card)});return box}
+ source.append(zone('bank','Карточки'));zones.append(zone('even','Чётный ответ'));zones.append(zone('odd','Нечётный ответ'));layout.append(source,zones);content.append(layout);const allPlaced=LESSON.sort.every(x=>sortPlacements[x.id]!=='bank');taskButton.textContent=taskSolved?'ЗАВЕРШИТЬ':'ПРОВЕРИТЬ';taskButton.disabled=!allPlaced&&!taskSolved;taskButton.onclick=()=>{if(taskSolved){showScreen(5);return}const wrong=LESSON.sort.filter(x=>sortPlacements[x.id]!==x.right);if(wrong.length){content.querySelectorAll('.sort-card').forEach(el=>{if(wrong.some(x=>x.id===el.dataset.id))el.classList.add('incorrect')});content.querySelectorAll('.dropzone:not(.bank)').forEach(el=>{if(wrong.some(x=>sortPlacements[x.id]===el.dataset.zone))el.classList.add('bad')});setFeedback('Есть ошибки. Проверь выделенные карточки.')}else{content.querySelectorAll('.dropzone:not(.bank)').forEach(el=>el.classList.add('ok'));completeTask()}}}
+let sortDrag={item:null,startX:0,startY:0,moved:false,id:null};
+function sortDown(e){if(taskSolved||e.button!==0)return;const card=e.currentTarget;sortDrag={item:card,startX:e.clientX,startY:e.clientY,moved:false,id:card.dataset.id};card.setPointerCapture(e.pointerId);card.addEventListener('pointermove',sortMove);card.addEventListener('pointerup',sortUp,{once:true});card.addEventListener('pointercancel',sortCancel,{once:true})}
+function sortMove(e){const d=sortDrag;if(d.item!==e.currentTarget)return;const dx=e.clientX-d.startX,dy=e.clientY-d.startY;if(Math.hypot(dx,dy)>9){d.moved=true;d.item.classList.add('dragging');d.item.style.transform='translate('+dx+'px,'+dy+'px)';d.item.style.pointerEvents='none';content.querySelectorAll('.dropzone').forEach(el=>{const r=el.getBoundingClientRect();el.classList.toggle('over',e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)})}}
+function sortUp(e){const d=sortDrag;if(d.item!==e.currentTarget)return;const target= d.moved?document.elementFromPoint(e.clientX,e.clientY)?.closest('.dropzone'):null;d.item.removeEventListener('pointermove',sortMove);d.item.style.transform='';d.item.style.pointerEvents='';d.item.classList.remove('dragging');content.querySelectorAll('.dropzone').forEach(el=>el.classList.remove('over'));if(target&&d.moved)assignSort(d.id,target.dataset.zone);sortDrag.item=null;if(d.moved){sortDrag.moved=true;setTimeout(()=>sortDrag.moved=false,30)}}
+function sortCancel(e){if(sortDrag.item!==e.currentTarget)return;sortDrag.item.removeEventListener('pointermove',sortMove);sortDrag.item.style.transform='';sortDrag.item.style.pointerEvents='';sortDrag.item.classList.remove('dragging');sortDrag.item=null;content.querySelectorAll('.dropzone').forEach(el=>el.classList.remove('over'))}
+videoButton.addEventListener('keydown',e=>{if(e.key===' ')e.preventDefault()});
+$('exitButton').addEventListener('click',()=>{window.close();setTimeout(()=>toast('Браузер не позволяет закрыть эту вкладку автоматически. Закройте её вручную.'),160)});
+resetState();showScreen(1);
+</script>
+</body>
+</html>
